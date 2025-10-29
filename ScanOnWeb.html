@@ -41,12 +41,25 @@
             font-weight: bold;
             color: green;
         }
+        #back-btn {
+  display: none;
+  background: #d9534f;
+}
+#back-btn:hover {
+  background: #c9302c;
+}
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Scan QR Code</h1>
-        <button id="start-btn">Start Scanner</button>
+        <h1>Scan QR Code</h1> 
+         <div id="home-buttons">
+    <button id="start-btn">📷 Start Scanner</button>
+    <input type="file" id="file-input" accept="image/*" />
+  </div>
+
+  <button id="back-btn">⬅️ Back</button>
+
         <div id="reader"></div>
         <div id="result"></div>
         <input type="hidden" id="VCode" name="VCode" value="" />
@@ -58,12 +71,16 @@
         const startBtn = document.getElementById("start-btn");
         const readerDiv = document.getElementById("reader");
         const resultDiv = document.getElementById("result");
+        
+const backBtn = document.getElementById("back-btn");
+const homeButtons = document.getElementById("home-buttons");
         let html5QrCode;
 
         startBtn.addEventListener("click", async () => {
             readerDiv.style.display = "block";
-            startBtn.style.display = "none";
-
+            //startBtn.style.display = "none";
+  homeButtons.style.display = "none";
+  backBtn.style.display = "inline-block";
             html5QrCode = new Html5Qrcode("reader");
 
             try {
@@ -73,10 +90,19 @@
                     (decodedText) => {
                         resultDiv.innerHTML = "QR: " + decodedText + "<br>Getting location...";
                         html5QrCode.stop();
-                        
+                          ReedomVoucher(decodedText);
+                                showHome();
                      
 
-                        if (navigator.geolocation) {
+                       
+                    }
+                );
+            } catch (err) {
+                resultDiv.textContent = "Camera error: " + err;
+            }
+        });
+        function ReedomVoucher(decodedText){
+             if (navigator.geolocation) {
                             navigator.geolocation.getCurrentPosition(
                                 (position) => {
                                     const lat = position.coords.latitude.toFixed(6);
@@ -86,7 +112,7 @@
                                 <b>Latitude:</b> ${lat}<br>
                                 <b>Longitude:</b> ${lon}
                             `;
-                                    ReedomVoucher(decodedText,lat,lon);
+                                  alert("QR Code:"+ decodedText+ "\n Latitude:"+ lat+"\n Longitude:+"+ lon);
                                 },
                                 (error) => {
                                     resultDiv.innerHTML = "Location error: " + error.message;
@@ -96,16 +122,26 @@
                         } else {
                             resultDiv.innerHTML = "Geolocation not supported by this browser.";
                         }
-                    }
-                );
-            } catch (err) {
-                resultDiv.textContent = "Camera error: " + err;
-            }
-        });
-        function ReedomVoucher(decodedText,lat,lon){
-            alert("QR Code:"+ decodedText+ "\n Latitude:"+ lat+"\n Longitude:+"+ lon);
+            
         }
- 
+ // ========== BACK BUTTON ==========
+backBtn.addEventListener("click", async () => {
+  try {
+    if (html5QrCode) {
+      await html5QrCode.stop();
+      await html5QrCode.clear();
+    }
+  } catch (err) {
+    console.warn("Camera stop error:", err);
+  }
+  showHome();
+});
+
+        function showHome() {
+  readerDiv.style.display = "none";
+  backBtn.style.display = "none";
+  homeButtons.style.display = "block";
+}
     </script>
 </body>
 </html>
@@ -329,4 +365,5 @@ video {
     </script>
 </body>
 </html>-->
+
  
