@@ -73,7 +73,13 @@ startBtn.addEventListener("click", async () => {
             alert("No camera found");
             return;
         }
-        const cameraId = devices[0].id;
+         let cameraId = devices[0].id;
+                for (let device of devices) {
+                    if (device.label.toLowerCase().includes("back") || device.label.toLowerCase().includes("rear")) {
+                        cameraId = device.id;
+                        break;
+                    }
+                }
 
         await html5QrCode.start(
             { deviceId: { exact: cameraId } },
@@ -126,3 +132,4 @@ stopBtn.addEventListener("click", async () => {
     </script>
 </body>
 </html>
+
